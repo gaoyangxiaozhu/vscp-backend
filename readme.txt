@@ -21,17 +21,19 @@
 海康NVR视频管理工具使用说明：
 
 列出NVR上的ip摄像头信息：
-hik [NVRIP] [port] [userName] [password] list
+./hik [NVRIP] [port] [userName] [password] list
 按时间和通道号下载视频
-hik [NVRIP] [port] [userName] [password] download [startTime] [endTime] [channel] [dir]
+./hik [NVRIP] [port] [userName] [password] download [startTime] [endTime] [channel] [dir]
 按照视频文件名下载视频
-hik [NVRIP] [port] [userName] [password] download [srcFile] [desFile]
+./hik [NVRIP] [port] [userName] [password] download [srcFile] [desFile]
 按时间和端口号查看视频文件块
-hik [NVRIP] [port] [userName] [password] queryBlock [startTime] [endTime] [channel]
+./hik [NVRIP] [port] [userName] [password] queryBlock [startTime] [endTime] [channel]
+根据视频文件名获取第一帧图像并保存在本地
+./hik [NVRIP] [port] [userName] [password] getPicture [srcFile] [desFile]
 
 example:
-hik 10.103.241.224 8000 admin 632911632 download 20150413101055 20150414105055 37 d:/file
-D:/hiktool/hik 10.103.242.225 8000 admin 632911632 list
-hik 10.103.242.225 8000 admin 632911632 queryBlock 20150413101055 20150414105055 31 d:/file
-
-hik 10.103.242.225 8000 admin 632911632 download 20151228101055 20151228121055 33 /home/
+./hik 10.103.241.105 8000 admin 632911632 download 20160413101055 20160414105055 37 ~/data
+./hik 10.103.242.105 8000 admin 632911632 list
+./hik 10.103.242.105 8000 admin 632911632 queryBlock 20160413101055 20160414105055 31 
+./hik 10.103.242.225 8000 admin 632911632 download 20161228101055 20161228121055 33 /home/
+./hik 10.103.242.105 8000 admin 632911632 getPicture ch01_02000000871000200  /home/gyy/data/1.jpg
