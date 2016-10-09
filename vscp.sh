@@ -76,16 +76,16 @@ do
 
     for LINE in  `${LISTCAMERACOMMOND}`
     do
-	
+
         CHANNELID=`echo $LINE | awk -F ',' '{ print $1 }' | awk -F ':' '{ print $2 }'`
         IPADDR=`echo $LINE | awk -F ',' '{ print $2 }' | awk -F ':' '{ print $2 }'`
-	    
-	RTSP_ID=$(((CHANNELID+1)*100+1)) 
+
+	RTSP_ID=$(((CHANNELID+1)*100+1))
 	CURRENT_IDLIST=`echo ${!CHANNELIST[@]}` # get all ipadder in currentlist array ( the ipadder in currentlist is the ip have already being processed)
-	
+
 	# each channel have a dir for storge the video file correspond to it
 	# if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
-        
+
 	DIR_NAME=`echo ch"$RTSP_ID"`
         if [ ! -d "$DIR_NAME" ];then
 	    mkdir $DIR_NAME
@@ -95,8 +95,8 @@ do
 
         if echo $LINE | grep 'channel' > /dev/null
         then
-	    
-	    # if not in channelist array add to channelist and start new job for current channel id
+
+	    # if not in channelist, array add to channelist and start new job for current channel id
 
 	    if [ "no" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
 	    then
@@ -105,9 +105,9 @@ do
 		 start_job_func $RTSP_ID $DIR_NAME
 		 echo "[START][CHANNEL ID : "$RTSP_ID"] start processing channel "$RTSP_ID" : "$IPADDR" by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}" . [/START]" >> process.log # write info to log
 	    else
-                 # if channelid is already in list , get the process id and judeg if it aleady dead 
+                 # if channelid is already in list , get the process id and judeg if it aleady dead
 		 # if has dead, restart new job for current channelid and update the value of CHANNELIST[$CHANNELID]
-		 SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]} 
+		 SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
 		 if [ "0" = `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
 	         then
 	              start_job_func $RTSP_ID $DTR_NAME
@@ -145,7 +145,3 @@ do
        `ps kill -9 "$ID" > /dev/null`
    fi
 done
-
-
-
-
