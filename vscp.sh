@@ -27,9 +27,9 @@ is_arrayhasitem(){
     do
         if [ "$2" = "$item" ]
         then
-	    echo yes
-	    return
-	fi
+            echo yes
+            return
+        fi
     done
     echo no
 }
@@ -82,53 +82,53 @@ do
         RTSP_ID=$(((CHANNELID+1)*100+1))
         CURRENT_IDLIST=`echo ${!CHANNELIST[@]}` # get all ipadder in currentlist array ( the ipadder in currentlist is the ip have already being processed)
 
-	    # each channel have a dir for storge the video file correspond to it
-	    # if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
+        # each channel have a dir for storge the video file correspond to it
+        # if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
 
         DIR_NAME=`echo ch"$RTSP_ID"`
-       if [ ! -d "$DIR_NAME" ];then
-           mkdir $DIR_NAME
-	   fi
+        if [ ! -d "$DIR_NAME" ];then
+            mkdir $DIR_NAME
+        fi
 
-	   # if current channel is active
+        # if current channel is active
 
-       if echo $LINE | grep 'channel' > /dev/null
-       then
+        if echo $LINE | grep 'channel' > /dev/null
+        then
 
-           # if not in channelist, array add to channelist and start new job for current channel id
+            # if not in channelist, array add to channelist and start new job for current channel id
 
-	       if [ "no" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
-	       then
-               CHANNELIST[$CHANNELID]=$IPADDR
-               ((++TOTAL))
-		       start_job_func $RTSP_ID $DIR_NAME
-		       echo "[START][CHANNEL ID : "$RTSP_ID"] start processing channel "$RTSP_ID" : "$IPADDR" by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}" . [/START]" >> process.log # write info to log
-	       else
-               # if channelid is already in list , get the process id and judeg if it aleady dead
-		       # if has dead, restart new job for current channelid and update the value of CHANNELIST[$CHANNELID]
-               SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
-		       if [ "0" = `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
-	           then
-	               start_job_func $RTSP_ID $DTR_NAME
-		           CHANNELIST[$CHANNELID]=$IPADDR
-		           echo "[RESTART][CHANNEL ID: "$RTSP_ID"] restart processing "$TRSP_ID" : "$IPADDR"  by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}". [/RESTART]" >> process.log
-		       fi
-	      fi
-	    else
-           # if current channel is not active
-	       # look up chnnelist , if current channel is in ,delete it
+            if [ "no" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
+            then
+                CHANNELIST[$CHANNELID]=$IPADDR
+                ((++TOTAL))
+                start_job_func $RTSP_ID $DIR_NAME
+                echo "[START][CHANNEL ID : "$RTSP_ID"] start processing channel "$RTSP_ID" : "$IPADDR" by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}" . [/START]" >> process.log # write info to log
+            else
+                # if channelid is already in list , get the process id and judeg if it aleady dead
+                # if has dead, restart new job for current channelid and update the value of CHANNELIST[$CHANNELID]
+                SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
+                if [ "0" = `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
+                then
+                    start_job_func $RTSP_ID $DTR_NAME
+                    CHANNELIST[$CHANNELID]=$IPADDR
+                    echo "[RESTART][CHANNEL ID: "$RTSP_ID"] restart processing "$TRSP_ID" : "$IPADDR"  by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}". [/RESTART]" >> process.log
+                fi
+            fi
+        else
+            # if current channel is not active
+            # look up chnnelist , if current channel is in ,delete it
 
-	       if [ "yes" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
-	       then
-		       unset CHANNELIST[$CHANNELID]
-		       unset SUB_PROCESS_FFMPEG[$RTSP_ID]
+            if [ "yes" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
+            then
+                unset CHANNELIST[$CHANNELID]
+                unset SUB_PROCESS_FFMPEG[$RTSP_ID]
 
-		       echo "[DELETE][CHANNEL ID : "$RTSP_ID"] channel "$RTSP_ID" is not active now, delete it from CURRENTLIST [/DELETE]" >> process.log
-		       ((--TOTAL))
-	       fi
-       fi
-   done
-   sleep 1m # loop every 1 minutes
+                echo "[DELETE][CHANNEL ID : "$RTSP_ID"] channel "$RTSP_ID" is not active now, delete it from CURRENTLIST [/DELETE]" >> process.log
+                ((--TOTAL))
+            fi
+        fi
+    done
+    sleep 1m # loop every 1 minutes
 done
 
 wait # wait sub process all died before exit
@@ -140,7 +140,7 @@ echo "main process exit..." >> process.log
 CHILDPROCESSLIST=`echo ${SUB_PROCESS_FFMPEG[@]}`
 for ID in ${CHILDPROCESSLIST[@]}
 do
-   if [ "1" = `ps --no-heading "$ID" | wc -l` ];then
-       `ps kill -9 "$ID" > /dev/null`
-   fi
+    if [ "1" = `ps --no-heading "$ID" | wc -l` ];then
+        `ps kill -9 "$ID" > /dev/null`
+    fi
 done
