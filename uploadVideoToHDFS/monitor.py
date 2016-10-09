@@ -196,6 +196,7 @@ class snyDataServer(multiprocessing.Process):
     def __handler(self):
         num = self.__dataQue.qsize()
         dataTmp = []
+        num = 6 if num > 6 else num # only execute 6 times insert statement each cycle, avoid long time connect to  mysql  
         for i in range(num):
             data = self.__dataQue.get()
             dataTmp.append(data)
