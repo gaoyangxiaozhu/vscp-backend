@@ -58,15 +58,6 @@ start_job_func()
 
 while true
 do
-    if ping -c 1 -w 2 baidu.com &>/dev/null
-    then
-        :
-    else
-        echo "[NETWORK ERROR] please connect to internet! [/NETWORK ERROR]" >> process.log
-        sleep 5m
-        continue
-    fi
-
     if ping -c 1 -w 2 ${NVR_URL} &> /dev/null
     then
         :
@@ -97,7 +88,7 @@ do
             if [ ! -d "$BASE_DIR/$DIR_NAME" ];then
                 mkdir "$BASE_DIR/$DIR_NAME"
             fi
-            
+
             # if not in channelist, array add to channelist and start new job for current channel id
 
             if [ "no" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
