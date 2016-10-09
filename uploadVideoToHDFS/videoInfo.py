@@ -89,10 +89,12 @@ class videoInfo():
                     dbRowData['year'] = dataTmp.group(3)
                     dbRowData['month'] = dataTmp.group(4)
                     dbRowData['day'] = dataTmp.group(5)
-                    # it is important to note that the 'f_name'field in db table is the video name in hdfs , not the local video name 
+                    # it is important to note that the 'f_name'field in db table is the video name in hdfs , not the local video name
                     dbRowData['f_name'] = filename if re.match('^ch', filename) else "-".join([self.__dirname, filename])
-                    dbRowData['size'] = math.ceil(float(formatData['size'])/1024)
                     dbRowData['format'] = formatData['format_name'] or dataTmp[9]
+                    dbRowData['f_name'] = dbRowData['f_name'].replace('.' + dbRowData['format'],'') # remove filename suffix eg: 'ch101-xxx.flv' to 'ch101-xxx'
+                    dbRowData['size'] = math.ceil(float(formatData['size'])/1024)
+
                     dbRowData['start_time'] = "%s-%s-%s %s:%s:%s"%(dataTmp.group(3), dataTmp.group(4),  dataTmp.group(5), dataTmp.group(7), dataTmp.group(7), dataTmp.group(8))
                     dbRowData['total_time'] = formatData['duration']
 
