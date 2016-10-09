@@ -99,6 +99,10 @@ class videoInfo():
                     dbRowData['total_time'] = formatData['duration']
 
                     remotePath = "/".join(["/data", dbRowData['channel'], dbRowData['year'], dbRowData['month'], dbRowData['day']])
+
+                    if dbRowData['size'] <  1.0:
+                        self.removeFile(localVideoPath) #if video file size < 1M delete it from local and continue
+                        continue
                     try:
                         self.uploadHDFS(videopath, remotePath, filename) #upload current video to hdfs
                         self.__dataSlot.append(dbRowData) #append video info to dataQue
