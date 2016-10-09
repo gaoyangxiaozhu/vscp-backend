@@ -16,6 +16,7 @@ LISTCAMERACOMMOND='./hik 10.103.242.105 8000 admin 632911632 list'
 URL_PREFIX='rtsp://admin:632911632@10.103.242.105:554/PSIA/streaming/channels/'
 NVR_URL='10.103.242.105'
 
+BASE_DIR='./data'
 ######################  tool function ########################
 
 # judge if elem in array
@@ -46,7 +47,8 @@ start_job_func()
     local RTSPID=$1
     local DIRNAME=$2
 
-    STARTCMD="ffmpeg -i rtsp://admin:632911632@10.103.242.105:554/PSIA/streaming/channels/$RTSPID -c copy -map 0 -f segment -strftime 1 -segment_time 300 -segment_format flv $DIRNAME/$RTSPID-%Y-%m-%d-%H-%M-%S.flv"
+    STARTCMD="ffmpeg -i rtsp://admin:632911632@10.103.242.105:554/PSIA/streaming/channels/$RTSPID -c copy -map 0 -f segment -strftime 1 -segment_time 300 -segment_format flv $BASE_DIR/$DIRNAME/$DIRNAME-%Y-%m-%d-%H-%M-%S.flv"
+    echo $STARTCMD
     (
     `${STARTCMD}`
     ) &
@@ -86,8 +88,8 @@ do
         # if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
 
         DIR_NAME=`echo ch"$RTSP_ID"`
-        if [ ! -d "$DIR_NAME" ];then
-            mkdir $DIR_NAME
+        if [ ! -d "$BASE_DIR/$DIR_NAME" ];then
+            mkdir "$BASE_DIR/$DIR_NAME"
         fi
 
         # if current channel is active
