@@ -33,33 +33,42 @@ class backupServer(threading.Thread):
         return (data[0], data[1], data[2], data[3], data[4], data[5], data[6])
 
     def run(self):
-        conn = self.__tableKeeper.getconnect()
-        if conn:
-            dataTmp = self.__data
-            cur = conn.cursor()
+        dataTmp = self.__data
 
-            if type(dataTmp) is list:
-                for item in self.__data:
-                    formatData = self.__formatData(item)
+        #local function for insert data to db
+        def __insertDataToDB():
+            conn = self.__tableKeeper.getconnect()
+            if conn:
+                cur = conn.cursor()
+                if type(dataTmp) is list:
+                    for item in self.__data:
+                        formatData = self.__formatData(item)
+                        print formatData
+                        if self.__tableKeeper.getTableName(conn, item[0]):
+                            cur.execute('''insert into %s(f_name, size, format, start_time, total_time, channel) values('%s','%s', '%s', '%s', '%s', '%s')'''%formatData)
+                            conn.commit()#Submit to database for execute
+                            logger.info('insert current videofiles info to table %s ...'%item[0])
+                elif type(dataTmp) is tuple:
+                    formatData = self.__formatData(dataTmp)
                     print formatData
-                    if self.__tableKeeper.getTableName(conn, item[0]):
+                    if self.__tableKeeper.getTableName(conn, dataTmp[0]):
+                        cur = conn.cursor()
                         cur.execute('''insert into %s(f_name, size, format, start_time, total_time, channel) values('%s','%s', '%s', '%s', '%s', '%s')'''%formatData)
+                        conn.commit()
                         logger.info('insert current videofiles info to table %s ...'%item[0])
-            elif type(dataTmp) is tuple:
-                formatData = self.__formatData(dataTmp)
-                print formatData
-                if self.__tableKeeper.getTableName(conn, dataTmp[0]):
-                    cur = conn.cursor()
-                    cur.execute('''insert into %s(f_name, size, format, start_time, total_time, channel) values('%s','%s', '%s', '%s', '%s', '%s')'''%formatData)
-                    logger.info('insert current videofiles info to table %s ...'%item[0])
-            else:
-                pass
-            conn.commit()
-            cur.close()
-            if len(dataTmp):
-                logger.info('insert videofiels info in dataQue to db successfully.')
+                else:
+                    pass
 
-        #close db connect
+                cur.close()#close cursor
+                if len(dataTmp):
+                    logger.info('insert videofiels info in dataQue to db successfully.')
+            try:
+                __insertDataToDB()
+            except (AttributeError, MySQLdb.OperationalError): # Lost connection to MySQL server during query
+                self.__tableKeeper.close()
+                __insertDataToDB()
+
+        #close current db connect
         self.__tableKeeper.close()
 
 class tableKeeper():
