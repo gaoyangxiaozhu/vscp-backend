@@ -34,9 +34,8 @@ class backupServer(threading.Thread):
 
     def run(self):
         dataTmp = self.__data
-
         #local function for insert data to db
-        def __insertDataToDB():
+        def insertDataToDB():
             conn = self.__tableKeeper.getconnect()
             if conn:
                 cur = conn.cursor()
@@ -62,11 +61,11 @@ class backupServer(threading.Thread):
                 cur.close()#close cursor
                 if len(dataTmp):
                     logger.info('insert videofiels info in dataQue to db successfully.')
-            try:
-                __insertDataToDB()
-            except (AttributeError, MySQLdb.OperationalError): # Lost connection to MySQL server during query
-                self.__tableKeeper.close()
-                __insertDataToDB()
+        try:
+            insertDataToDB()
+        except (AttributeError, MySQLdb.OperationalError): # Lost connection to MySQL server during query
+            self.__tableKeeper.close()
+            insertDataToDB()
 
         #close current db connect
         self.__tableKeeper.close()
