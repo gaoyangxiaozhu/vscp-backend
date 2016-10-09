@@ -84,19 +84,20 @@ do
         RTSP_ID=$(((CHANNELID+1)*100+1))
         CURRENT_IDLIST=`echo ${!CHANNELIST[@]}` # get all ipadder in currentlist array ( the ipadder in currentlist is the ip have already being processed)
 
-        # each channel have a dir for storge the video file correspond to it
-        # if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
 
-        DIR_NAME=`echo ch"$RTSP_ID"`
-        if [ ! -d "$BASE_DIR/$DIR_NAME" ];then
-            mkdir "$BASE_DIR/$DIR_NAME"
-        fi
 
         # if current channel is active
 
         if echo $LINE | grep 'channel' > /dev/null
         then
+            # each channel have a dir for storge the video file correspond to it
+            # if not exist dir for it , creat dir for it , the dir name is channelid eg: ch101, ch201
 
+            DIR_NAME=`echo ch"$RTSP_ID"`
+            if [ ! -d "$BASE_DIR/$DIR_NAME" ];then
+                mkdir "$BASE_DIR/$DIR_NAME"
+            fi
+            
             # if not in channelist, array add to channelist and start new job for current channel id
 
             if [ "no" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
