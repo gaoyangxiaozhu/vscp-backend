@@ -5,12 +5,12 @@ Created on 2016.10.7
 @author: Gyy
 '''
 import logging
-
+from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger('monitor')
 logger.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler('../monitor.log')
+fh = RotatingFileHandler('../monitor.log',maxBytes="10*1024*1024", backupCount=3)
 ch = logging.StreamHandler()
 
 
