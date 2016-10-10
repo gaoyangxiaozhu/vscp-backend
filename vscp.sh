@@ -54,8 +54,9 @@ start_job_func()
     RTSPID=$1
     DIRNAME=$2
 
+    sleep 1s
     STARTCMD="ffmpeg -i rtsp://admin:632911632@10.103.242.105:554/PSIA/streaming/channels/$RTSPID -c copy -map 0 -f segment -strftime 1 -segment_time 300 -segment_format flv $BASE_DIR/$DIRNAME/$DIRNAME-%Y-%m-%d-%H-%M-%S.flv"
-    echo $STARTCMD
+    
     (
     `${STARTCMD}`
     ) &
@@ -92,7 +93,7 @@ do
 
             if echo $LINE | grep 'channel' > /dev/null
             then
-                IPADDR=`echo $LINE | cut -d "," -f 1 | cut -d ':' -f 2`
+                IPADDR=`echo $LINE | cut -d "," -f 2 | cut -d ':' -f 2`
                 CURRENT_RTSP_ID_LIST=`echo ${!CHANNELIST[@]}` # get all ipadder in currentlist array ( the ipadder in currentlist is the ip have already being processed)
 
                 # each channel have a dir for storge the video file correspond to it
@@ -115,9 +116,10 @@ do
                     SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
                     if [ 0 -eq `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
                     then
-                        start_job_func $RTSP_ID $DTR_NAME
                         CHANNELIST[$RTSP_ID]=$IPADDR
-                        echo "`get_date`[RESTART][CHANNEL ID: "$RTSP_ID"] restart processing "$TRSP_ID" : "$IPADDR"  by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}". [/RESTART]" >> process.log
+
+                        start_job_func $RTSP_ID $DIR_NAME
+                        echo "`get_date`[RESTART][CHANNEL ID: "$RTSP_ID"] restart processing "$RTSP_ID" : "$IPADDR"  by child process "${SUB_PROCESS_FFMPEG[$RTSP_ID]}". [/RESTART]" >> process.log
                     fi
                 fi
             else
