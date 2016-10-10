@@ -100,9 +100,9 @@ class videoInfo():
 
                     remotePath = "/".join(["/data", dbRowData['channel'], dbRowData['year'], dbRowData['month'], dbRowData['day']])
 
-                    if dbRowData['size'] / 1024.0 <  1.0:
+                    if dbRowData['size'] / 1024.0 <  2.0:
                         print 'current video file is not good, delete it directly.'
-                        self.removeFile(videopath) #if video file size < 1M delete it from local and continue
+                        self.removeFile(videopath) #if video file size < 2M delete it from local and continue
                         continue
                     try:
                         self.uploadHDFS(videopath, remotePath, filename) #upload current video to hdfs
