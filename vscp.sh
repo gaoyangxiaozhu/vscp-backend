@@ -44,8 +44,8 @@ declare -A SUB_PROCESS_FEMPEG
 
 start_job_func()
 {
-    local RTSPID=$1
-    local DIRNAME=$2
+    RTSPID=$1
+    DIRNAME=$2
 
     STARTCMD="ffmpeg -i rtsp://admin:632911632@10.103.242.105:554/PSIA/streaming/channels/$RTSPID -c copy -map 0 -f segment -strftime 1 -segment_time 300 -segment_format flv $BASE_DIR/$DIRNAME/$DIRNAME-%Y-%m-%d-%H-%M-%S.flv"
     echo $STARTCMD
@@ -69,8 +69,8 @@ do
 
     for LINE in  `${LISTCAMERACOMMOND}`
     do
-        CHANNELID=`echo $LINE | awk -F ',' '{ print $1 }' | awk -F ':' '{ print $2 }'`
-        IPADDR=`echo $LINE | awk -F ',' '{ print $2 }' | awk -F ':' '{ print $2 }'`
+        CHANNELID=`echo $LINE | cut -d "," -f 1 | cut -d ':' -f 2`
+        IPADDR=`echo $LINE | cut -d "," -f 1 | cut -d ':' -f 2`
 
         RTSP_ID=$(((CHANNELID+1)*100+1))
         CURRENT_IDLIST=`echo ${!CHANNELIST[@]}` # get all ipadder in currentlist array ( the ipadder in currentlist is the ip have already being processed)
@@ -101,7 +101,7 @@ do
                 # if channelid is already in list , get the process id and judeg if it aleady dead
                 # if has dead, restart new job for current channelid and update the value of CHANNELIST[$CHANNELID]
                 SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
-                if [ "0" = `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
+                if [ 0 -eq `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ]
                 then
                     start_job_func $RTSP_ID $DTR_NAME
                     CHANNELIST[$CHANNELID]=$IPADDR
@@ -115,14 +115,17 @@ do
             if [ "yes" = `is_arrayhasitem "$CURRENT_IDLIST" "$CHANNELID"` ]
             then
                 unset CHANNELIST[$CHANNELID]
+                SUB_FFMPEG_PROCESS_ID=${SUB_PROCESS_FFMPEG[$RTSP_ID]}
+                if [ 0 -ne `ps --no-heading "$SUB_FFMPEG_PROCESS_ID" | wc -l` ];then
+                    kill -9 $SUB_FFMPEG_PROCESS_ID > /dev/null 2>&1
+                fi
                 unset SUB_PROCESS_FFMPEG[$RTSP_ID]
-
                 echo "[DELETE][CHANNEL ID : "$RTSP_ID"] channel "$RTSP_ID" is not active now, delete it from CURRENTLIST [/DELETE]" >> process.log
                 ((--TOTAL))
             fi
         fi
     done
-    sleep 1m # loop every 1 minutes
+    sleep 2m # loop every 1 minutes
 done
 
 wait # wait sub process all died before exit
