@@ -95,7 +95,7 @@ class videoInfo():
                     dbRowData['f_name'] = dbRowData['f_name'].replace('.' + dbRowData['format'],'') # remove filename suffix eg: 'ch101-xxx.flv' to 'ch101-xxx'
                     dbRowData['size'] = math.ceil(float(formatData['size'])/1024)
 
-                    dbRowData['start_time'] = "%s-%s-%s %s:%s:%s"%(dataTmp.group(3), dataTmp.group(4),  dataTmp.group(5), dataTmp.group(7), dataTmp.group(7), dataTmp.group(8))
+                    dbRowData['start_time'] = "%s-%s-%s %s:%s:%s"%(dataTmp.group(3), dataTmp.group(4),  dataTmp.group(5), dataTmp.group(6), dataTmp.group(7), dataTmp.group(8))
                     dbRowData['total_time'] = formatData['duration']
 
                     remotePath = "/".join(["/data", dbRowData['channel'], dbRowData['year'], dbRowData['month'], dbRowData['day']])
